@@ -5,11 +5,15 @@
 
 
 
+<a>
+https://tiendas3e.github.io/pos/
+</a>
 
-con todo el cariño nerd.
+<img width="1199" height="740" alt="image" src="https://github.com/user-attachments/assets/d7acbc08-91a5-4680-aa8d-1f4c104750fe" />
 
 
-Hice **dos cosas** :
+
+## **dos cosas** :
 
 1. Te aviso: algunos archivos que subiste antes vencieron y no puedo leerlos aquí. Si quieres que integre tu repo exacto (`cajero-main.zip` / otros), vuelve a subirlos o dame acceso al repo privado. Mientras tanto, **voy a darte una versión completa y lista para pegar** que funcionará en tu repositorio tal cual (solo crea la carpeta `/data/` y pega los JSON).
 

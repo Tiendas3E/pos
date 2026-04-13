@@ -136,7 +136,7 @@
         <button id="waBtn" class="btn" style="background:linear-gradient(90deg,#34c759,#06b6d4)">WhatsApp</button>
       </div>
 
-      <div style="margin-top:10px" class="small">Tickets guardados localmente. Para puntos reales conecta Firebase/Supabase.</div>
+      <div style="margin-top:10px" class="small">Tickets guardados localmente. Para puntos reales conecta Database -.</div>
     </div>
 
     <div style="height:12px"></div>
@@ -149,7 +149,7 @@
   </aside>
 </div>
 
-<footer>Diseño RGB · OS Shop · <span id="buildInfo">v0.0.10 demo</span>
+<footer>Diseño RGB · Tiendas 3E - Sucursal-  Shop · <span id="buildInfo">v0.0.10 demo</span>
 <div id="miniPromoBox">
   <img id="miniPromoImg" src="" alt="Promo" />
   <div id="miniPromoTitle"></div>
@@ -260,7 +260,7 @@ async function loadAll() {
   renderSkeletons();
   document.getElementById('statusBadge').textContent = 'Cargando productos...';
   try {
-    const data = await fetchWithTimeout('./data/products.json', 2500);
+    const data = await fetchWithTimeout('data/products.json', 2500);
     PRODUCTS = data.products || [];
     localStorage.setItem('os_products', JSON.stringify(PRODUCTS));
     document.getElementById('sourceLabel').textContent = 'data/products.json (fetch)';

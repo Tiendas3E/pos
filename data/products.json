@@ -1,0 +1,8 @@
+
+{
+  "products": [
+    { "id":"p001", "name":"Cargador USB-C", "price":299, "stock":12 },
+    { "id":"p002", "name":"Laptop Básica", "price":8500, "stock":3 },
+    { "id":"p003", "name":"Mouse Óptico", "price":149, "stock":25 }
+  ]
+}

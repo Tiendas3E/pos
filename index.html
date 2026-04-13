@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Market V0.0.10 — OS Shop</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#071025; --card:#0f1726; --glass: rgba(255,255,255,0.04);
+    --accent1:#8b5cf6; --accent2:#06b6d4; --accent3:#f97316;
+    color-scheme: dark;
+    font-family: Inter, system-ui, Arial;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#03041a 0%, #071025 60%); color:#e6eef8; -webkit-font-smoothing:antialiased}
+  header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent1),var(--accent2));box-shadow:0 8px 30px rgba(107,70,193,0.25);display:flex;align-items:center;justify-content:center;font-weight:700}
+  h1{margin:0;font-size:18px}
+  .container{display:grid;grid-template-columns:1fr 360px;gap:18px;padding:18px}
+  /* Productos */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+  .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.08));border-radius:12px;padding:12px;box-shadow:0 10px 30px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
+  .thumb{height:120px;border-radius:8px;background:linear-gradient(45deg,#111 0%, #20202a 100%);display:flex;align-items:center;justify-content:center;color:#9aa3b2;font-size:13px}
+  .product-name{font-weight:600;margin-top:8px}
+  .price{font-weight:700;color:var(--accent2);margin-top:6px}
+  .btn{cursor:pointer;padding:8px 12px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:white;font-weight:600}
+  .muted{color:rgba(230,238,248,0.6);font-size:13px}
+  /* Carrito */
+  .aside{position:sticky;top:18px}
+  .cart-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .cart-items{max-height:420px;overflow:auto;margin-top:12px;display:flex;flex-direction:column;gap:8px}
+  .item-row{display:flex;justify-content:space-between;gap:8px;background:var(--glass);padding:8px;border-radius:8px}
+  .total{margin-top:12px;font-weight:800;font-size:18px;color:var(--accent3)}
+  .small{font-size:13px;color:rgba(230,238,248,0.6)}
+  .skeleton{height:120px;border-radius:8px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.04), rgba(255,255,255,0.02)); animation: shine 1.2s linear infinite}
+  @keyframes shine{0%{background-position:-200px 0}100%{background-position:200px 0}}
+  footer{padding:18px;text-align:center;color:rgba(230,238,248,0.5)}
+  .badge{background:rgba(255,255,255,0.04);padding:6px 8px;border-radius:8px;font-weight:600;color:#bcd}
+  .controls{display:flex;gap:8px;align-items:center}
+  input,select{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+  .compact{font-size:13px;padding:6px 8px}
+  @media(max-width:900px){.container{grid-template-columns:1fr;}.aside{position:static}}
+
+
+
+
+
+  #miniPromoBox {
+    width: 290px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(0,0,0,0.15));
+    padding: 14px;
+    border-radius: 14px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    margin: 20px auto;
+    text-align: center;
+    animation: fadeIn 0.5s ease;
+}
+
+#miniPromoImg {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 10px;
+    background: #111;
+}
+
+#miniPromoTitle {
+    margin-top: 10px;
+    font-weight: 600;
+}
+
+#miniPromoPrice {
+    margin-top: 5px;
+    font-weight: 700;
+    color: var(--accent2);
+}
+
+@keyframes fadeIn {
+    from { opacity:0; transform:scale(0.96); }
+    to   { opacity:1; transform:scale(1); }
+}
+
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logo">OS</div>
+    <div>
+      <h1>Bio-us Marketplace</h1>
+      <div class="muted">Tu marketplace modular — demo</div>
+    </div>
+  </div>
+  <div class="controls">
+    <div id="statusBadge" class="badge">Cargando...</div>
+    <select id="filterVendor" class="compact"><option value="">Todos</option></select>
+    <button id="refreshBtn" class="compact">Refrescar</button>
+  </div>
+</header>
+
+<div class="container">
+  <main>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div class="muted" id="sourceLabel">Cargando catálogo...</div>
+      <div class="muted">Planes: <span id="planLabel">—</span></div>
+    </div>
+
+    <div id="productsGrid" class="grid">
+      <!-- cards o skeletons -->
+    </div>
+  </main>
+
+  <aside class="aside">
+    <div class="card">
+      <div class="cart-head">
+        <div>
+          <div class="muted">Carrito</div>
+          <div class="small" id="cartCount">0 items</div>
+        </div>
+        <div><button id="clearCart" class="compact">Limpiar</button></div>
+      </div>
+
+      <div id="cartItems" class="cart-items" aria-live="polite"></div>
+
+      <div class="total" id="totalLine">Total: $0.00</div>
+      <div class="small" id="pointsLine">Puntos cliente: 0</div>
+
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <input id="clienteId" placeholder="Email o phone (opcional)" style="flex:1"/>
+      </div>
+
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <button id="closeTicket" class="btn">Cerrar ticket</button>
+        <button id="waBtn" class="btn" style="background:linear-gradient(90deg,#34c759,#06b6d4)">WhatsApp</button>
+      </div>
+
+      <div style="margin-top:10px" class="small">Tickets guardados localmente. Para puntos reales conecta Firebase/Supabase.</div>
+    </div>
+
+    <div style="height:12px"></div>
+    <div class="card">
+      <div class="muted">Demo Admin</div>
+      <div style="margin-top:8px;">
+        <button id="openAdmin" class="compact">Panel Admin</button>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<footer>Diseño RGB · OS Shop · <span id="buildInfo">v0.0.10 demo</span>
+<div id="miniPromoBox">
+  <img id="miniPromoImg" src="" alt="Promo" />
+  <div id="miniPromoTitle"></div>
+  <div id="miniPromoPrice"></div>
+</div>
+
+</footer>
+
+<script>
+/* ---------------- util: fetch con timeout ---------------- */
+function fetchWithTimeout(url, ms = 2500) {
+  return Promise.race([
+    fetch(url).then(r => { if(!r.ok) throw 'fetch-fail'; return r.json(); }),
+    new Promise((_, rej) => setTimeout(() => rej('timeout'), ms))
+  ]);
+}
+
+/* ---------------- estado ---------------- */
+let PRODUCTS = [];
+let VENDORS = [];
+let CART = [];
+const telefonoVendedor = '5215577000000'; // cambia por tu número real si quieres probar
+
+/* ---------------- helpers (celdas de lógica) ---------------- */
+// suma total (digit-by-digit mental: JS calcula floats, mostramos con toFixed)
+function calcTotal(cart) {
+  return cart.reduce((acc, it) => acc + (Number(it.price) * Number(it.qty)), 0);
+}
+function calcClientPoints(total) {
+  const p = total * 0.01; // 1%
+  return Number(p.toFixed(2));
+}
+function calcCajeroIncentive() { return 1; } // por ticket
+function cartToWhatsAppText(cart) {
+  const lines = cart.map(i => `${i.qty}x ${i.name} - $${(i.qty*i.price).toFixed(2)}`);
+  const total = calcTotal(cart).toFixed(2);
+  return encodeURIComponent(`Pedido:\n${lines.join('\\n')}\nTotal: $${total}`);
+}
+
+/* ---------------- UI render ---------------- */
+function renderSkeletons() {
+  const grid = document.getElementById('productsGrid');
+  grid.innerHTML = Array.from({length:8}).map(()=>`<div class="card"><div class="thumb skeleton"></div><div style="height:10px"></div><div class="skeleton" style="height:14px"></div></div>`).join('');
+}
+function renderProducts(list) {
+  const grid = document.getElementById('productsGrid');
+  if (!list.length) {
+    grid.innerHTML = `<div class="card"><div class="muted">No hay productos</div></div>`;
+    return;
+  }
+  grid.innerHTML = list.map(p => `
+    <div class="card">
+      <div class="thumb">${p.img ? `<img src="${p.img}" style="max-width:100%;border-radius:6px"/>` : '<div style="text-align:center">IMG</div>'}</div>
+      <div class="product-name">${p.name}</div>
+      <div class="price">$${Number(p.price).toFixed(2)}</div>
+      <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+        <input class="qty" data-id="${p.id}" type="number" min="1" value="1" style="width:70px;padding:6px;border-radius:8px"/>
+        <button class="btn addBtn" data-id="${p.id}">Agregar</button>
+      </div>
+      <div class="small" style="margin-top:8px">Stock: ${p.stock}</div>
+    </div>
+  `).join('');
+
+  // listeners
+  document.querySelectorAll('.addBtn').forEach(b => b.addEventListener('click', (e) => {
+    const id = e.target.dataset.id;
+    const input = document.querySelector(`.qty[data-id="${id}"]`);
+    const qty = Math.max(1, Number(input.value || 1));
+    const p = PRODUCTS.find(x=>x.id===id);
+    addToCart({ id: p.id, name: p.name, price: Number(p.price), qty });
+  }));
+}
+
+/* ---------------- cart actions ---------------- */
+function addToCart(item) {
+  // si ya existe, suma qty
+  const idx = CART.findIndex(i => i.id === item.id);
+  if (idx >= 0) CART[idx].qty += item.qty;
+  else CART.push(item);
+  renderCart();
+  saveLocal('os_cart', CART);
+}
+function renderCart() {
+  const container = document.getElementById('cartItems');
+  const total = calcTotal(CART);
+  document.getElementById('totalLine').textContent = 'Total: $' + total.toFixed(2);
+  document.getElementById('pointsLine').textContent = 'Puntos cliente: ' + calcClientPoints(total).toFixed(2);
+  document.getElementById('cartCount').textContent = CART.length + ' items';
+
+  if (!CART.length) { container.innerHTML = '<div class="small muted">Carrito vacío</div>'; return; }
+  container.innerHTML = CART.map((it, i) => `<div class="item-row">
+    <div style="flex:1"><strong>${it.name}</strong><div class="small">x${it.qty} · $${it.price}</div></div>
+    <div style="text-align:right">$${(it.qty*it.price).toFixed(2)}<br><button data-idx="${i}" class="compact removeBtn">X</button></div>
+  </div>`).join('');
+  container.querySelectorAll('.removeBtn').forEach(b => b.addEventListener('click', e => {
+    const i = Number(e.target.dataset.idx);
+    CART.splice(i,1); renderCart(); saveLocal('os_cart',CART);
+  }));
+}
+function clearCart() { CART = []; renderCart(); saveLocal('os_cart', CART); }
+
+/* ---------------- storage helpers ---------------- */
+function saveLocal(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
+function loadLocal(k, fallback){ try{ const s = localStorage.getItem(k); return s ? JSON.parse(s) : fallback; }catch(e){ return fallback; } }
+
+/* ---------------- load data (fetch con timeout + fallback a localStorage) ---------------- */
+async function loadAll() {
+  renderSkeletons();
+  document.getElementById('statusBadge').textContent = 'Cargando productos...';
+  try {
+    const data = await fetchWithTimeout('./data/products.json', 2500);
+    PRODUCTS = data.products || [];
+    localStorage.setItem('os_products', JSON.stringify(PRODUCTS));
+    document.getElementById('sourceLabel').textContent = 'data/products.json (fetch)';
+  } catch (e) {
+    const stored = loadLocal('os_products', []);
+    if (stored.length) {
+      PRODUCTS = stored;
+      document.getElementById('sourceLabel').textContent = 'localStorage (fallback)';
+    } else {
+      PRODUCTS = [];
+      document.getElementById('sourceLabel').textContent = 'sin datos';
+    }
+  }
+  // carga pricing
+  try {
+    const pD = await fetchWithTimeout('./data/pricing.json', 2500);
+    const pro = pD.plans?.find(x=>x.id==='pro');
+    document.getElementById('planLabel').textContent = pro ? `${pro.name} $${pro.price_mxn}/mes` : '—';
+  } catch(e){
+    document.getElementById('planLabel').textContent = '—';
+  }
+
+  // render
+  renderProducts(PRODUCTS);
+  document.getElementById('statusBadge').textContent = 'Listo';
+  // restore cart
+  CART = loadLocal('os_cart', []);
+  renderCart();
+}
+
+/* ---------------- ticket flow: cerrar y guardar ---------------- */
+function createTicketObject(clienteId=null) {
+  const total = Number(calcTotal(CART).toFixed(2));
+  const puntos = calcClientPoints(total);
+  const incentivo = calcCajeroIncentive();
+  return {
+    id: 'tk_' + Date.now(),
+    cliente: clienteId,
+    items: CART,
+    total,
+    puntos_generados: puntos,
+    incentivo_cajero: incentivo,
+    createdAt: new Date().toISOString()
+  };
+}
+
+function closeTicket() {
+  if (!CART.length) return alert('Carrito vacío');
+  const cliente = document.getElementById('clienteId').value.trim() || null;
+  const ticket = createTicketObject(cliente);
+  const tickets = loadLocal('os_tickets', []);
+  tickets.unshift(ticket);
+  saveLocal('os_tickets', tickets);
+
+  // incentivos cajero (guardamos en os_cajeros.local)
+  const cajeroKey = 'cajero_default';
+  const cajeros = loadLocal('os_cajeros', {});
+  cajeros[cajeroKey] = cajeros[cajeroKey] || { name: 'Cajero', incentivo: 0 };
+  cajeros[cajeroKey].incentivo = (cajeros[cajeroKey].incentivo || 0) + ticket.incentivo_cajero;
+  saveLocal('os_cajeros', cajeros);
+
+  // puntos cliente
+  if (cliente) {
+    const clients = loadLocal('os_clients', {});
+    clients[cliente] = clients[cliente] || { id: cliente, puntos: 0 };
+    clients[cliente].puntos = Number((clients[cliente].puntos + ticket.puntos_generados).toFixed(2));
+    saveLocal('os_clients', clients);
+  }
+
+  // abrir ticket en nueva ventana para imprimir
+  const w = window.open('','_blank','width=600,height=800');
+  w.document.write(buildTicketHTML(ticket));
+  w.document.close();
+  // limpiar carrito
+  clearCart();
+  document.getElementById('statusBadge').textContent = `Ticket ${ticket.id} generado`;
+}
+
+/* ---------------- ticket HTML simple ---------------- */
+function buildTicketHTML(t) {
+  const rows = t.items.map(i=>`<tr><td>${i.name}</td><td>${i.qty}</td><td>$${i.price}</td><td>$${(i.qty*i.price).toFixed(2)}</td></tr>`).join('');
+  return `
+  <html><head><meta charset="utf-8"><title>Ticket ${t.id}</title>
+  <style>body{font-family:Arial;padding:16px;color:#111}table{width:100%;border-collapse:collapse}td,th{padding:6px;border-bottom:1px solid #ddd}</style>
+  </head><body>
+  <h2>OS TIENDA</h2><p>ID: ${t.id}<br>Fecha: ${t.createdAt}</p>
+  <table><thead><tr><th>Producto</th><th>Cant</th><th>PU</th><th>Sub</th></tr></thead><tbody>${rows}</tbody></table>
+  <h3>Total: $${t.total.toFixed(2)}</h3><p>Puntos: ${t.puntos_generados.toFixed(2)}</p><p>Gracias por comprar</p>
+  <script>setTimeout(()=>window.print(),400);< /script></body></html>`;
+}
+
+/*
+
+/* ---------------- WhatsApp link ---------------- */
+function sendWhatsApp() {
+  if (!CART.length) return alert('Carrito vacío');
+  const txt = cartToWhatsAppText(CART);
+  const url = `https://wa.me/${telefonoVendedor}?text=${txt}`;
+  window.open(url, '_blank');
+}
+
+/* ---------------- admin demo ---------------- */
+function openAdmin() {
+  const tickets = loadLocal('os_tickets', []);
+  const clients = loadLocal('os_clients', {});
+  const cajeros = loadLocal('os_cajeros', {});
+  const html = `
+    <html><head><meta charset="utf-8"><title>Admin</title></head><body style="font-family:Arial;padding:16px">
+    <h3>Admin demo</h3>
+    <h4>Tickets (${tickets.length})</h4>
+    <pre>${JSON.stringify(tickets.slice(0,20), null, 2)}</pre>
+    <h4>Clientes</h4><pre>${JSON.stringify(clients, null, 2)}</pre>
+    <h4>Cajeros</h4><pre>${JSON.stringify(cajeros, null,2)}</pre>
+    </body></html>`;
+  const w = window.open('','_blank','width=900,height=700'); w.document.write(html); w.document.close();
+}
+
+/* ---------------- eventos ---------------- */
+document.getElementById('refreshBtn').addEventListener('click', loadAll);
+document.getElementById('clearCart').addEventListener('click', ()=>{ if(confirm('Limpiar carrito?')) clearCart(); });
+document.getElementById('closeTicket').addEventListener('click', closeTicket);
+document.getElementById('waBtn').addEventListener('click', sendWhatsApp);
+document.getElementById('openAdmin').addEventListener('click', openAdmin);
+
+/* ---------------- init ---------------- */
+(async function init(){ await loadAll(); })();
+
+
+/* 
+
+-----------------------
+
+Mini-promos (rotación) 
+
+----------------------------------
+*/
+const PROMOS = [
+  { img: "https://picsum.photos/400/300?1", title: "Laptop básica 14''", price: "$8,500" },
+  { img: "https://picsum.photos/400/300?2", title: "Cargador USB-C rápido", price: "$299" },
+  { img: "https://picsum.photos/400/300?3", title: "Combo Mouse + Teclado", price: "$499" },
+  { img: "https://picsum.photos/400/300?4", title: "Audífonos gamer RGB", price: "$699" }
+];
+
+let promoIndex = 0;
+
+function renderPromo() {
+    const box  = document.getElementById("miniPromoBox");
+    const img  = document.getElementById("miniPromoImg");
+    const tit  = document.getElementById("miniPromoTitle");
+    const prc  = document.getElementById("miniPromoPrice");
+
+    const p = PROMOS[promoIndex];
+
+    img.src        = p.img;
+    tit.textContent = p.title;
+    prc.textContent = p.price;
+
+    promoIndex = (promoIndex + 1) % PROMOS.length;
+
+    // animación suave
+    box.style.opacity = 0;
+    setTimeout(()=> box.style.opacity = 1, 150);
+}
+
+// rotar cada 5 segundos
+setInterval(renderPromo, 5000);
+
+// iniciar
+renderPromo();
+
+</script>
+</body>
+</html>

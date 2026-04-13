@@ -1,0 +1,9 @@
+
+{
+  "plans": [
+    { "id": "basic", "name": "Plan Básico", "price_mxn": 500, "billing": "mensual", "features": ["Catálogo principal","Carrito con WhatsApp","Subdominio empresa.vercel.app","Actualizaciones menores","Soporte básico"] },
+    { "id": "pro", "name": "Plan Profesional", "price_mxn": 1400, "billing": "mensual", "features": ["Todo del Plan Básico","Dashboard de métricas","Chat interno vendedor-cliente","Reportes PDF","Branding personalizado","Soporte prioridad"] },
+    { "id": "enterprise", "name": "Plan Empresa", "price_mxn": 3200, "billing": "mensual", "features": ["Todo del Plan Profesional","Multiusuario","Roles y permisos","Reportes avanzados","Integraciones extra","Soporte diario","Custom features"] }
+  ]
+}
+```
